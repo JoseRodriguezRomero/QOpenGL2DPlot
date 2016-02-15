@@ -1721,11 +1721,6 @@ void QOpenGL2DPlot::setPoint(int plot_index, const QPointF &point,
 #endif
 
     plot_data->data[plot_index][index] = point;
-
-    if (plot_data->m_program.isLinked())
-    {
-        SetDataPointsPosition(plot_data,plot_index);
-    }
 }
 
 void QOpenGL2DPlot::setPoints(int plot_index,
@@ -1956,6 +1951,21 @@ void Redraw(QOpenGLWidget *parent, PlotDataStruct *plot_data)
         parent->repaint();
     }
 }
+
+void QOpenGL2DPlot::repaint()
+{
+    if (plot_data->m_program.isLinked())
+    {
+        int len = plot_data->data.length();
+
+        for (int i = 0; i < len; i++)
+        {
+            SetDataPointsPosition(plot_data,i);
+        }
+        Redraw(this,plot_data);
+    }
+}
+
 
 void QOpenGL2DPlot::setLogScale(Direction Direction,
                                 bool logscale)

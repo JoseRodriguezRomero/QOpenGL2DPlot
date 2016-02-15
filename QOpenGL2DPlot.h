@@ -26,6 +26,7 @@ typedef struct PlotDataStruct PlotDataStruct;
 
 class QOpenGL2DPlot : public QOpenGLWidget, protected QOpenGLFunctions
 {
+    Q_OBJECT
 public:
     enum Axis {
         Bottom  = 0,
@@ -147,6 +148,9 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
+
+public slots:
+    void repaint();
 };
 
 #endif // QOPENGL2DPLOT_H

@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(refresh,SIGNAL(clicked(bool)),this,SLOT(RefreshSerialList()));
     connect(start,SIGNAL(clicked(bool)),this,SLOT(StartPressed()));
-    connect(&gl_timer,SIGNAL(timeout()),gl_scene,SLOT(update()));
+    connect(&gl_timer,SIGNAL(timeout()),gl_scene,SLOT(repaint()));
     connect(&read_thread,SIGNAL(ValueRead(int)),this,SLOT(SetValue(int)));
 }
 

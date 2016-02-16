@@ -30,6 +30,7 @@ void SerialReaderThread::Read()
     {
         serial.waitForReadyRead(3000);
         buffer = serial.readAll();
+        serial.flush();
     }
 
     read_data.append(buffer);
@@ -91,9 +92,12 @@ void SerialReaderThread::SetSerialName(const QString &name)
 void SerialReaderThread::Start()
 {
     emit Started();
+    serial.open(QIODevice::ReadOnly);
+    serial.flush();
 }
 
 void SerialReaderThread::Stop()
 {
     emit Stopped();
+    serial.close();
 }

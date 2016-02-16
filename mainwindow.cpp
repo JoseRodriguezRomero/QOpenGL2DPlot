@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     gl_scene->setRange(QOpenGL2DPlot::Left,1024,0);
     gl_scene->setRange(QOpenGL2DPlot::Bottom,1000,0);
-    gl_scene->addPlots(1);
+    gl_scene->addPlots(2);
 
     gl_scene->setTickStep(QOpenGL2DPlot::Left,100);
     gl_scene->setTickStep(QOpenGL2DPlot::Bottom,100);
@@ -61,7 +61,13 @@ MainWindow::MainWindow(QWidget *parent)
         vals.append(QPointF(999-i,512));
     }
 
+    gl_scene->addPoints(1,vals);
+
+    vals.clear();
+    vals.append(QPointF(0,0));
+    vals.append(QPointF(0,1024));
     gl_scene->addPoints(0,vals);
+    gl_scene->setPlotColor(0,QColor(Qt::red));
 
     gl_timer.setInterval(15);
     gl_timer.start();
@@ -131,7 +137,11 @@ void MainWindow::SetValue(int value)
     double x = static_cast<double>(current);
     double y = static_cast<double>(value);
 
-    gl_scene->setPoint(0,QPointF(x,y),current);
+    gl_scene->setPoint(1,QPointF(x,y),current);
+
+    gl_scene->setPoint(0,QPointF(x,0),0);
+    gl_scene->setPoint(0,QPointF(x,1024),1);
+
     current++;
 
     if (current >= 1000)

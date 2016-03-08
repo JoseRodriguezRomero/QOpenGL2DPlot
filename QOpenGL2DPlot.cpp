@@ -617,7 +617,7 @@ void SetLinGridPosition(PlotDataStruct *plot_data, int side)
     int count = ceil((top-bot)/step);
     plot_data->ticks_count[side] = count;
 
-    GLfloat pos[count*4];
+    GLfloat *pos = new GLfloat[count*4];
 
     if (side == LEFT || side == RIGHT)
     {
@@ -660,15 +660,15 @@ void SetLinGridPosition(PlotDataStruct *plot_data, int side)
 
     uint total_sec_count = (count+2)*sec_count*4;
     plot_data->total_sec_ticks_count[side] = total_sec_count/2.0;
-    GLfloat sec_pos[total_sec_count];
+    GLfloat *sec_pos = new GLfloat[total_sec_count];
 
     double sec_step_val;
 
     if (side == LEFT || side == RIGHT)
     {
-        for (int i = 0; i <= count+2; i++)
+        for (int i = 0; i < count+2; i++)
         {
-            for (int j = 0; j <= sec_count; j++)
+            for (int j = 0; j < sec_count; j++)
             {
                 sec_step_val = unit_step*(i-1)+
                         (j+1)*unit_sec_step+unit_rem;
@@ -682,9 +682,9 @@ void SetLinGridPosition(PlotDataStruct *plot_data, int side)
     }
     else
     {
-        for (int i = 0; i <= count+2; i++)
+        for (int i = 0; i < count+2; i++)
         {
-            for (int j = 0; j <= sec_count; j++)
+            for (int j = 0; j < sec_count; j++)
             {
                 sec_step_val = unit_step*(i-1)+
                         (j+1)*unit_sec_step+unit_rem;
@@ -709,6 +709,9 @@ void SetLinGridPosition(PlotDataStruct *plot_data, int side)
         sec_grid_buffer->release();
     }
     sec_vao_binder.release();
+
+    delete[] pos;
+    delete[] sec_pos;
 }
 
 void SetLogGridPosition(PlotDataStruct *plot_data, int side)
@@ -724,7 +727,7 @@ void SetLogGridPosition(PlotDataStruct *plot_data, int side)
     int count = ceil(top-bot);
     plot_data->ticks_count[side] = count;
 
-    GLfloat pos[4*count];
+    GLfloat *pos = new GLfloat[4*count];
     double step_val;
 
     if (side == LEFT || side == RIGHT)
@@ -777,7 +780,7 @@ void SetLogGridPosition(PlotDataStruct *plot_data, int side)
 
     plot_data->total_sec_ticks_count[side] = 2*8*(count+2);
 
-    GLfloat sec_pos[4*8*(count+2)];
+    GLfloat *sec_pos = new GLfloat[4*8*(count+2)];
     double sec_step_val;
 
     if (side == LEFT || side == RIGHT)
@@ -825,6 +828,9 @@ void SetLogGridPosition(PlotDataStruct *plot_data, int side)
         sec_grid_buffer->release();
     }
     sec_vao_binder.release();
+
+    delete[] pos;
+    delete[] sec_pos;
 }
 
 void SetGridPosition(PlotDataStruct *plot_data, int side)
@@ -1038,7 +1044,9 @@ QOpenGL2DPlot::QOpenGL2DPlot(QWidget *parent):
 }
 
 QOpenGL2DPlot::~QOpenGL2DPlot()
-{
+{   
+    makeCurrent();
+
     plot_data->m_program.bind();
     plot_data->frame_pos_buffer.destroy();
     plot_data->frame_index_buffer.destroy();
@@ -1945,7 +1953,7 @@ void Redraw(QOpenGLWidget *parent, PlotDataStruct *plot_data)
             SetPositions(plot_data);
             SetTickLabelsPositions(plot_data);
             SetLabels(plot_data);
-            plot_data->m_program.release();
+            //plot_data->m_program.release();
         }
         parent->doneCurrent();
         parent->repaint();

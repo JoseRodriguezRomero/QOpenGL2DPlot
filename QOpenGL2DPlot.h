@@ -2,9 +2,12 @@
 #define QOPENGL2DPLOT_H
 
 #ifdef ANDROID
-#include <GLES/gl.h>
+    #include <GLES/gl.h>
+#elif WIN32
+    #include <Windows.h>
+    #include <gl/GL.h>
 #else
-#include <GL/gl.h>
+    #include <GL/gl.h>
 #endif
 
 #include <QOpenGLWidget>

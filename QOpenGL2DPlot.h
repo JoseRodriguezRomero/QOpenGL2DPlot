@@ -151,9 +151,6 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int w, int h);
-
-public slots:
-    void repaint();
 };
 
 #endif // QOPENGL2DPLOT_H

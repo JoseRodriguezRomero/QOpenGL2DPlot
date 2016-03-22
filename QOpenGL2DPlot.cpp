@@ -1947,33 +1947,26 @@ void Redraw(QOpenGLWidget *parent, PlotDataStruct *plot_data)
         parent->makeCurrent();
         {
             plot_data->m_program.bind();
+
+            int len = plot_data->data.length();
+
+            for (int i = 0; i < len; i++)
+            {
+                SetDataPointsPosition(plot_data,i);
+            }
+
             SetFrameSize(plot_data,parent->rect());
             SetScales(plot_data);
             SetProjectionMatrices(plot_data,parent->rect());
             SetPositions(plot_data);
             SetTickLabelsPositions(plot_data);
             SetLabels(plot_data);
-            //plot_data->m_program.release();
+
+            plot_data->m_program.release();
         }
         parent->doneCurrent();
-        parent->repaint();
     }
 }
-
-void QOpenGL2DPlot::repaint()
-{
-    if (plot_data->m_program.isLinked())
-    {
-        int len = plot_data->data.length();
-
-        for (int i = 0; i < len; i++)
-        {
-            SetDataPointsPosition(plot_data,i);
-        }
-        Redraw(this,plot_data);
-    }
-}
-
 
 void QOpenGL2DPlot::setLogScale(Direction Direction,
                                 bool logscale)

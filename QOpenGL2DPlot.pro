@@ -18,10 +18,8 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    QOpenGL2DPlot.cpp \
-    serialreaderthread.cpp
+    QOpenGL2DPlot.cpp
 
 HEADERS  += mainwindow.h \
-    QOpenGL2DPlot.h \
-    serialreaderthread.h
+    QOpenGL2DPlot.h
 

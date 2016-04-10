@@ -3,8 +3,8 @@
 #define MAX_FRAME_MARGIN            5
 #define MARGIN_REL_SIZE             0.05
 
-#define TITLE_REL_SIZE              0.15
-#define LABEL_REL_SIZE              0.05
+#define TITLE_REL_SIZE              0.20
+#define LABEL_REL_SIZE              0.10
 
 #define BOTTOM                      0
 #define TOP                         1
@@ -382,29 +382,31 @@ void SetFrameSize(PlotDataStruct *plot_data,
     plot_data->labels_rect[LEFT].setY(plot_data->plot_pane.y());
 
     plot_data->labels_rect[LEFT].setHeight(h_label);
-    plot_data->labels_rect[LEFT].setWidth(plot_data->plot_pane.height()-1);
+    plot_data->labels_rect[LEFT].setWidth(plot_data->plot_pane.height() - 1);
 
     plot_data->tick_labels_rect[LEFT].setX(plot_data->plot_pane.topLeft().x()
                                 -w_label-h_label_s_comp);
     plot_data->tick_labels_rect[LEFT].setY(plot_data->plot_pane.y());
 
     plot_data->tick_labels_rect[LEFT].setWidth(w_label);
-    plot_data->tick_labels_rect[LEFT].setHeight(plot_data->plot_pane.height()-1);
+    plot_data->tick_labels_rect[LEFT].setHeight(plot_data->plot_pane.height()
+                                                - 1);
 
     //RIGHT
 
     plot_data->labels_rect[RIGHT].setX(viewport.width()-h_label-w_margin);
     plot_data->labels_rect[RIGHT].setY(plot_data->plot_pane.y());
 
-    plot_data->labels_rect[RIGHT].setWidth(plot_data->plot_pane.height()-1);
+    plot_data->labels_rect[RIGHT].setWidth(plot_data->plot_pane.height() - 1);
     plot_data->labels_rect[RIGHT].setHeight(h_label);
 
-    plot_data->tick_labels_rect[RIGHT].setX(plot_data->plot_pane.topRight().x()+
-                                            h_label_s_comp);
+    plot_data->tick_labels_rect[RIGHT].setX(plot_data->plot_pane.topRight().x()
+                                            + h_label_s_comp);
     plot_data->tick_labels_rect[RIGHT].setY(plot_data->plot_pane.y());
 
     plot_data->tick_labels_rect[RIGHT].setWidth(w_label);
-    plot_data->tick_labels_rect[RIGHT].setHeight(plot_data->plot_pane.height()-1);
+    plot_data->tick_labels_rect[RIGHT].setHeight(plot_data->plot_pane.height()
+                                                 - 1);
 
     //BOTTOM
 
@@ -415,10 +417,11 @@ void SetFrameSize(PlotDataStruct *plot_data,
     plot_data->labels_rect[BOTTOM].setHeight(h_label);
 
     plot_data->tick_labels_rect[BOTTOM].setX(plot_data->plot_pane.x());
-    plot_data->tick_labels_rect[BOTTOM].setY(plot_data->plot_pane.bottomLeft().y()
-                                             +(h_label_s_comp));
+    plot_data->tick_labels_rect[BOTTOM].setY(
+                plot_data->plot_pane.bottomLeft().y() + (h_label_s_comp));
 
-    plot_data->tick_labels_rect[BOTTOM].setWidth(plot_data->plot_pane.width()-1);
+    plot_data->tick_labels_rect[BOTTOM].setWidth(plot_data->plot_pane.width()
+                                                 - 1);
     plot_data->tick_labels_rect[BOTTOM].setHeight(h_label);
 
     //TOP
@@ -430,7 +433,8 @@ void SetFrameSize(PlotDataStruct *plot_data,
     plot_data->labels_rect[TOP].setWidth(plot_data->plot_pane.width()-1);
 
     plot_data->tick_labels_rect[TOP].setX(plot_data->plot_pane.x());
-    plot_data->tick_labels_rect[TOP].setY(plot_data->plot_pane.y()-h_label_comp);
+    plot_data->tick_labels_rect[TOP].setY(plot_data->plot_pane.y() -
+                                          h_label_comp);
 
     plot_data->tick_labels_rect[TOP].setWidth(plot_data->plot_pane.width()-1);
     plot_data->tick_labels_rect[TOP].setHeight(h_label);
@@ -906,7 +910,8 @@ void SetTickLabelsPositions(PlotDataStruct *plot_data, int side)
 
         count = floor(delta/plot_data->tick_step[side])+1;
 
-        rem = remainder(plot_data->bottom_range[side],plot_data->tick_step[side]);
+        rem = remainder(plot_data->bottom_range[side],
+                        plot_data->tick_step[side]);
         rel_rem = rem/(plot_data->top_range[side]-
                                   plot_data->bottom_range[side]);
 
@@ -1173,8 +1178,8 @@ void SetLinLabel(PlotDataStruct *plot_data, int side)
 {
     int base = ceil((plot_data->bottom_range[side])/
                     (plot_data->tick_step[side]));
-    int delta = floor((plot_data->top_range[side]-plot_data->bottom_range[side])/
-                      (plot_data->tick_step[side]));
+    int delta = floor((plot_data->top_range[side]-plot_data->bottom_range[side])
+                      /(plot_data->tick_step[side]));
 
     double num = base*(plot_data->tick_step[side]);
 
@@ -1430,20 +1435,12 @@ void DrawLabels(PlotDataStruct *plot_data)
 
     //TICK LABELS
 
-    int count;
-
-    QTextOption text_opt[4];
-    text_opt[BOTTOM] = QTextOption(Qt::AlignHCenter|Qt::AlignTop);
-    text_opt[TOP]    = QTextOption(Qt::AlignHCenter|Qt::AlignBottom);
-    text_opt[LEFT]   = QTextOption(Qt::AlignVCenter|Qt::AlignRight);
-    text_opt[RIGHT]  = QTextOption(Qt::AlignVCenter|Qt::AlignLeft);
-
     for (int i = 0; i < 4; i++)
     {
         if (plot_data->tick_labels_visible[i])
         {
             QRect *tick_rects = plot_data->tick_labels_rects[i].data();
-            count = plot_data->tick_labels_rects[i].count();
+            int count = plot_data->tick_labels_rects[i].count();
             QString *tick_labels = plot_data->tick_labels[i].data();
 
             for (int j = 0; j < count; j++)
@@ -1452,7 +1449,7 @@ void DrawLabels(PlotDataStruct *plot_data)
                                     tick_rects[i]);
 
                 painter->drawText(tick_rects[j],tick_labels[j],
-                                  text_opt[i]);
+                                  QTextOption(Qt::AlignCenter));
             }
         }
     }
@@ -1651,7 +1648,15 @@ void QOpenGL2DPlot::addPlots(const QVector<QVector<QPointF>> data,
 
     for (int i = 0; i < data_count; i++)
     {
-        it = before+i;
+        if (plot_data->data.size() == 0)
+        {
+            it = 0;
+        }
+        else
+        {
+            it = before+i+1;
+        }
+
         plot_data->data.insert(it,data[i]);
         plot_data->data_color.insert(it,DEFAULT_PLOT_COLOR);
         plot_data->data_visible.insert(it,DEFAULT_PLOT_VISIBLE);
@@ -1659,8 +1664,10 @@ void QOpenGL2DPlot::addPlots(const QVector<QVector<QPointF>> data,
                     it,QOpenGLBuffer(QOpenGLBuffer::VertexBuffer));
         plot_data->data_index_buffer.insert(
                     it,QOpenGLBuffer(QOpenGLBuffer::IndexBuffer));
-        plot_data->data_vao.insert(
-                    it,new QOpenGLVertexArrayObject(this));
+
+        QOpenGLVertexArrayObject *vao = new QOpenGLVertexArrayObject(this);
+
+        plot_data->data_vao.insert(it,vao);
 
         if (plot_data->m_program.isLinked())
         {
@@ -1966,6 +1973,61 @@ void Redraw(QOpenGLWidget *parent, PlotDataStruct *plot_data)
         }
         parent->doneCurrent();
     }
+}
+
+void QOpenGL2DPlot::setTitle(const QString &title)
+{
+    plot_data->title = title;
+    Redraw(this,plot_data);
+}
+
+int axis_side(QOpenGL2DPlot::Axis axis)
+{
+    int side;
+
+    switch (axis)
+    {
+    case QOpenGL2DPlot::Bottom:
+        side = BOTTOM;
+        break;
+    case QOpenGL2DPlot::Top:
+        side = TOP;
+        break;
+    case QOpenGL2DPlot::Left:
+        side = LEFT;
+        break;
+    case QOpenGL2DPlot::Right:
+        side = RIGHT;
+        break;
+    }
+
+    return side;
+}
+
+void QOpenGL2DPlot::setLabel(Axis axis, const QString &label)
+{
+    plot_data->labels[axis_side(axis)] = label;
+    Redraw(this,plot_data);
+}
+
+const QString QOpenGL2DPlot::Title() const
+{
+    return plot_data->title;
+}
+
+const QString QOpenGL2DPlot::Label(Axis axis) const
+{
+    return plot_data->labels[axis_side(axis)];
+}
+
+int QOpenGL2DPlot::PlotCount() const
+{
+    return plot_data->data.count();
+}
+
+int QOpenGL2DPlot::PlotSize(int index) const
+{
+    return plot_data->data[index].count();
 }
 
 void QOpenGL2DPlot::setLogScale(Direction Direction,

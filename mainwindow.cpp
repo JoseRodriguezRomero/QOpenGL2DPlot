@@ -3,149 +3,53 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    QFrame *main_frame = new QFrame(this);
-    main_frame->setLayout(new QHBoxLayout(main_frame));
-    main_frame->setFrameStyle(QFrame::StyledPanel);
-    main_frame->layout()->setContentsMargins(0,0,0,0);
-    this->setCentralWidget(main_frame);
-    main_frame->setFrameStyle(QFrame::NoFrame);
-
     gl_scene = new QOpenGL2DPlot(this);
-    gl_scene->setMinimumWidth(180*3);
-    gl_scene->setMinimumHeight(180*2.5);
-    main_frame->layout()->addWidget(gl_scene);
+    this->setCentralWidget(gl_scene);
 
-    gl_scene->setRange(QOpenGL2DPlot::Left,1024,0);
-    gl_scene->setRange(QOpenGL2DPlot::Bottom,1000,0);
-    gl_scene->addPlots(2);
+    gl_scene->setTitle("My Plot");
+    gl_scene->setLabel(QOpenGL2DPlot::Left,"My Left Label");
+    gl_scene->setLabel(QOpenGL2DPlot::Bottom,"My Bottom Label");
 
-    gl_scene->setTickStep(QOpenGL2DPlot::Left,100);
-    gl_scene->setTickStep(QOpenGL2DPlot::Bottom,100);
+    gl_scene->setRange(QOpenGL2DPlot::Bottom,100,0);
+    gl_scene->setRange(QOpenGL2DPlot::Left,1,0);
 
-    gl_scene->hideTitle();
+    gl_scene->setTickStep(QOpenGL2DPlot::Bottom,10);
+    gl_scene->setTickStep(QOpenGL2DPlot::Left,.1);
 
-    gl_scene->hideTickLabel(QOpenGL2DPlot::Left);
-    gl_scene->hideTickLabel(QOpenGL2DPlot::Bottom);
+    QVector<QPointF> values;
+    QPointF aux;
 
-    gl_scene->hideLabel(QOpenGL2DPlot::Left);
-    gl_scene->hideLabel(QOpenGL2DPlot::Bottom);
-
-    QFrame *F1 = new QFrame(this);
-    F1->setLayout(new QVBoxLayout(F1));
-    F1->setFixedWidth(180);
-    main_frame->layout()->addWidget(F1);
-
-    serial_names = new QComboBox(this);
-    F1->layout()->addWidget(serial_names);
-
-    QFrame *F11 = new QFrame(this);
-    F11->setLayout(new QHBoxLayout(F11));
-    F11->layout()->setContentsMargins(0,0,0,0);
-    F1->layout()->addWidget(F11);
-
-    refresh = new QPushButton(this);
-    refresh->setText("Refresh");
-    F11->layout()->addWidget(refresh);
-
-    start = new QPushButton(this);
-    start->setText("Start");
-    F11->layout()->addWidget(start);    
-
-    F1->layout()->addItem(new QSpacerItem(0,0,QSizePolicy::MinimumExpanding,
-                                          QSizePolicy::MinimumExpanding));
-
-    QVector<QPointF> vals;
-
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i <= 100; i++)
     {
-        vals.append(QPointF(999-i,512));
+        aux.setX(40.0*cos(1.0*i*2*M_PI/100.0)+50.0);
+        aux.setY( 0.4*sin(2.0*i*2*M_PI/100.0)+ 0.5);
+
+        values.append(aux);
     }
 
-    gl_scene->addPoints(1,vals);
+    gl_scene->addPlot();
+    gl_scene->addPoints(0,values);
+    gl_scene->setPlotColor(0,Qt::green);
 
-    vals.clear();
-    vals.append(QPointF(0,0));
-    vals.append(QPointF(0,1024));
-    gl_scene->addPoints(0,vals);
-    gl_scene->setPlotColor(0,QColor(Qt::red));
 
-    gl_timer.setInterval(15);
-    gl_timer.start();
+    values.clear();
 
-    current = 0;
+    for (int i = 0; i <= 100; i++)
+    {
+        aux.setX(20.0*cos(1.0*i*2*M_PI/100.0)+50.0);
+        aux.setY( 0.2*sin(1.0*i*2*M_PI/100.0)+ 0.5);
 
-    connect(refresh,SIGNAL(clicked(bool)),this,SLOT(RefreshSerialList()));
-    connect(start,SIGNAL(clicked(bool)),this,SLOT(StartPressed()));
-    connect(&gl_timer,SIGNAL(timeout()),gl_scene,SLOT(repaint()));
-    connect(&read_thread,SIGNAL(ValueRead(int)),this,SLOT(SetValue(int)));
+        values.append(aux);
+    }
+
+    gl_scene->addPlot();
+    gl_scene->addPoints(1,values);
+    gl_scene->setPlotColor(1,QColor(Qt::red));
+
+    std::cout << gl_scene->PlotSize(0) << std::endl;
+    std::cout << gl_scene->PlotSize(1) << std::endl;
 }
 
 MainWindow::~MainWindow()
 {    
-    read_thread.Stop();
-
-    while (read_thread.my_thread()->isRunning())
-    {
-        read_thread.my_thread()->quit();
-        read_thread.my_thread()->wait();
-    }
-}
-
-void MainWindow::RefreshSerialList()
-{
-    QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
-
-    QStringList port_names;
-
-    foreach (QSerialPortInfo port_info, list)
-    {
-        port_names.append(port_info.portName());
-    }
-
-    serial_names->clear();
-    serial_names->addItems(port_names);
-}
-
-void MainWindow::StartPressed()
-{
-    if (start->text() == "Start")
-    {
-        Start();
-    }
-    else
-    {
-        Stop();
-    }
-}
-
-void MainWindow::Start()
-{
-    start->setText("Stop");
-
-    read_thread.SetSerialName(serial_names->currentText());
-    read_thread.Start();
-}
-
-void MainWindow::Stop()
-{
-    start->setText("Start");
-    read_thread.Stop();
-}
-
-void MainWindow::SetValue(int value)
-{
-    double x = static_cast<double>(current);
-    double y = static_cast<double>(value);
-
-    gl_scene->setPoint(1,QPointF(x,y),current);
-
-    gl_scene->setPoint(0,QPointF(x,0),0);
-    gl_scene->setPoint(0,QPointF(x,1024),1);
-
-    current++;
-
-    if (current >= 1000)
-    {
-        current = 0;
-    }
 }

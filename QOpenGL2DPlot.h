@@ -25,6 +25,11 @@
 
 #include <math.h>
 
+#ifdef QT_DEBUG
+#include <QDebug>
+#include <iostream>
+#endif
+
 typedef struct PlotDataStruct PlotDataStruct;
 
 class QOpenGL2DPlot : public QOpenGLWidget, protected QOpenGLFunctions
@@ -55,6 +60,15 @@ public:
 
     bool isFrameVisible() const;
     bool isFrameHidden()  const;
+
+    void setTitle(const QString &title);
+    void setLabel(Axis axis, const QString &label);
+
+    const QString Title() const;
+    const QString Label(Axis axis) const;
+
+    int PlotCount() const;
+    int PlotSize(int index) const;
 
     void hideLabel(Axis axis, bool hide = true);
     void showLabel(Axis axis, bool show = true);
@@ -145,7 +159,8 @@ public:
 
     void RefreshPlot(Axis axis);
 
-    void SaveSVG(const QString &fileName, const QString &description = QString(""));
+    void SaveSVG(const QString &fileName,
+                 const QString &description = QString(""));
 
 protected:
     void initializeGL();
